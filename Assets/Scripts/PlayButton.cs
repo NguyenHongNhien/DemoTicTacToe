@@ -2,16 +2,16 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using UnityEngine.UI;
 
 public class PlayButton : MonoBehaviour
 {
-    public string gameMode;
-    public GameObject PersistantObject;
+    public GameObject persistantObj;
 
-    public void OnMouseDown()
+    public string gameMode;
+
+    public void OnClicked()
     {
-        PersistantObject.GetComponent<PersistanceScript>().gameMode = gameMode;
+        persistantObj.GetComponent<PersistanceScript>().gameMode = gameMode;
         SceneManager.LoadScene("GameScreen");
     }
 }
