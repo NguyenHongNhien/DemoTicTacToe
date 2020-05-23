@@ -1,17 +1,19 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Security.Cryptography;
 using UnityEngine;
 using UnityEngine.UI;
+
 
 public class GameScript : MonoBehaviour
 {
     public string gameMode;
     public GameObject cross, nought, bar;
 
-    public Text Instructions;
+    public Text Instructions, player2Name;
 
-    public enum Seed { EMPTY, CROSS, NOUGHT};
+    public enum Seed { EMPTY, CROSS, NOUGHT };
 
     public Seed Turn;
 
@@ -27,9 +29,16 @@ public class GameScript : MonoBehaviour
     private void Awake()
     {
         // to get the Game mode information from the previous scene
-        //GameObject persistantObj = GameObject.FindGameObjectWithTag("PersistantObj") as GameObject;
-        //gameMode = persistantObj.GetComponent<PersistanceScript>().gameMode;
-        //Destroy(persistantObj);
+        GameObject persistantObj = GameObject.FindGameObjectWithTag("PersistantObj") as GameObject;
+        gameMode = persistantObj.GetComponent<PersistanceScript>().gameMode;
+        Destroy(persistantObj);
+
+        // gameMode = "vscpu";
+
+        if (gameMode == "vscpu")
+            player2Name.text = "CPU Player";
+        else
+            player2Name.text = "2nd Player";
 
         // set turn as 1st player which is CROSS
         Turn = Seed.CROSS;
@@ -38,7 +47,7 @@ public class GameScript : MonoBehaviour
         Instructions.text = "Turn: 1st Player";
 
         // to maintain the state of the cell
-        for(int i=0; i<9; i++)
+        for (int i = 0; i < 9; i++)
             player[i] = Seed.EMPTY;
 
     }
@@ -72,10 +81,60 @@ public class GameScript : MonoBehaviour
                 Instructions.text = "Turn: 2nd Player";
             }
         }
-        else if (Turn == Seed.NOUGHT)
+
+        else if (Turn == Seed.NOUGHT && gameMode == "2player")
         {
             allSpawns[id] = Instantiate(nought, emptycell.transform.position, Quaternion.identity);
             player[id] = Turn;
+
+            if (Won(Turn))
+            {
+                // change the turn
+                Turn = Seed.EMPTY;
+
+                // change the instructions
+                Instructions.text = "Player-2 has won!!!";
+
+                // Spawn bar
+                float slope = calculateSlope();
+                Instantiate(bar, calculateCenter(), Quaternion.Euler(0, 0, slope));
+            }
+            else
+            {
+                // change the turn
+                Turn = Seed.CROSS;
+
+                // change the instructions
+                Instructions.text = "Turn: 1st Player";
+            }
+        }
+
+        if (Turn == Seed.NOUGHT && gameMode == "vscpu")
+        {
+                int bestScore = -1, bestPos = -1, score;
+
+                for (int i = 0; i < 9; i++)
+                {
+                    if (player[i] == Seed.EMPTY)
+                    {
+                        player[i] = Seed.NOUGHT;
+                        score = minimax(Seed.CROSS, player, -1000, +1000);
+                        player[i] = Seed.EMPTY;
+
+                        if (bestScore < score)
+                        {
+                            bestScore = score;
+                            bestPos = i;
+                        }
+                    }
+                }
+
+                if (bestPos > -1)
+                {
+                    allSpawns[bestPos] = Instantiate(nought, allSpawns[bestPos].transform.position, Quaternion.identity);
+                    player[bestPos] = Turn;
+                }
+            
 
             if (Won(Turn))
             {
@@ -133,11 +192,10 @@ public class GameScript : MonoBehaviour
                                                 {0, 3, 6}, {1, 4, 7}, {2, 5, 8},
                                                 {0, 4, 8}, {2, 4, 6} };
 
-        
         // check conditions
-        for(int i = 0; i < 8; i++)
+        for (int i = 0; i < 8; i++)
         {
-            if(player[allConditions[i, 0]] == currPlayer &
+            if (player[allConditions[i, 0]] == currPlayer &
                 player[allConditions[i, 1]] == currPlayer &
                 player[allConditions[i, 2]] == currPlayer)
             {
@@ -167,7 +225,7 @@ public class GameScript : MonoBehaviour
 
         bool isDraw = false;
 
-        if(player1Won == false & player2Won == false & anyEmpty == false)
+        if (player1Won == false & player2Won == false & anyEmpty == false)
             isDraw = true;
 
         return isDraw;
@@ -196,4 +254,63 @@ public class GameScript : MonoBehaviour
 
         return slope;
     }
+
+    int minimax(Seed currPlayer, Seed[] board, int alpha, int beta)
+    {
+
+        if (IsDraw())
+            return 0;
+
+        if (Won(Seed.NOUGHT))
+            return +1;
+
+        if (Won(Seed.CROSS))
+            return -1;
+
+
+        int score;
+
+        if(currPlayer == Seed.NOUGHT)
+        {
+            for(int i=0; i < 9; i++)
+            {
+                if(board[i] == Seed.EMPTY)
+                {
+                    board[i] = Seed.NOUGHT;
+                    score = minimax(Seed.CROSS, board, alpha, beta);
+                    board[i] = Seed.EMPTY;
+
+                    if (score > alpha)
+                        alpha = score;
+
+                    if (alpha > beta)
+                        break;
+                }
+            }
+
+            return alpha;
+        }
+
+        else
+        {
+            for (int i = 0; i < 9; i++)
+            {
+                if (board[i] == Seed.EMPTY)
+                {
+                    board[i] = Seed.CROSS;
+                    score = minimax(Seed.NOUGHT, board, alpha, beta);
+                    board[i] = Seed.EMPTY;
+
+                    if (score < beta)
+                        beta = score;
+
+                    if (alpha > beta)
+                        break;
+                }
+            }
+
+            return beta;
+        }
+    }
+
 }

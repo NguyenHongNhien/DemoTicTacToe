@@ -1710,6 +1710,7 @@ MonoBehaviour:
   nought: {fileID: 3995383964128474385, guid: 1b853b7e48db2eb42b91a02fe9e01354, type: 3}
   bar: {fileID: 6618781984380252999, guid: a3ed6eabb1379dd40a8048bbeb8ea06f, type: 3}
   Instructions: {fileID: 31023502}
+  player2Name: {fileID: 1034722434}
   Turn: 0
   allSpawns:
   - {fileID: 996456412}
