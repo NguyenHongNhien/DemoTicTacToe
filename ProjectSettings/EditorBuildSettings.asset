@@ -9,9 +9,18 @@ EditorBuildSettings:
     path: Assets/Scenes/SplashScreen.unity
     guid: 74c506b08b3803a4bb7bd2b5e1b18923
   - enabled: 1
-    path: Assets/Scenes/MainScreen.unity
+    path: Assets/Scenes/PlayGameScreen/MainScreen.unity
     guid: 7ff5d7326fbe2684caa4366ed3bc9fc0
   - enabled: 1
     path: Assets/Scenes/GameScreen.unity
     guid: f021778be8c054d4fb206d591056d601
+  - enabled: 1
+    path: Assets/Scenes/MainScreen.unity
+    guid: 6ac6ec6e7a107114aa377fbe543d90a6
+  - enabled: 1
+    path: Assets/Scenes/PlaneScreen/MainPlane.unity
+    guid: 2d66b14ac3e70b744aabcf28d8391bfd
+  - enabled: 1
+    path: Assets/Scenes/PlaneScreen/GamePlane.unity
+    guid: 36e8fd102b3e027489e6b662341c98e3
   m_configObjects: {}
